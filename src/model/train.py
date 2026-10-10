@@ -3,6 +3,8 @@
     python -m src.model.train                 # uses A's data/processed/splits.json
     python -m src.model.train --dev-split     # until splits.json exists; numbers not reportable
 
+    python -m src.model.train --tiers D       # DistilBERT; needs requirements-bert.txt, ~20 min on an M2
+
 Per tier: out-of-fold scores on the train/val folds drive calibration and
 threshold selection; the test ids are only ever scored once, at the end.
 """
@@ -17,7 +19,7 @@ from sklearn.metrics import (average_precision_score, brier_score_loss, precisio
                              precision_score, recall_score, roc_auc_score)
 
 from src.model.data import LABEL_COL, RAW_CSV, ROOT, SPLITS_JSON, dev_splits, load_postings, load_splits
-from src.model.features import TIERS, build_frame, make_pipeline
+from src.model.features import OPTIONAL_TIERS, TIERS, build_frame, make_pipeline
 from src.model.predict import FraudModel, apply_calibrator, fit_calibrator
 
 
@@ -43,13 +45,21 @@ def pick_threshold(y, scores, precision_target):
 
 
 def train_tier(tier, X, y, fold_positions, X_test, y_test, args):
-    raw_oof = oof_scores(tier, X, y, fold_positions)
-    calibrator = fit_calibrator(args.calibration, raw_oof, y)
-    cal_oof = apply_calibrator(calibrator, raw_oof)
-    threshold = pick_threshold(y, cal_oof, args.precision_target)
+    if tier in OPTIONAL_TIERS:
+        # Too slow for k+1 fits: train once on all folds but the last, calibrate on the last.
+        val = fold_positions[-1]
+        train = np.setdiff1d(np.arange(len(X)), val)
+        pipeline = make_pipeline(tier).fit(X.iloc[train], y.iloc[train])
+        raw_val, y_val = pipeline.predict_proba(X.iloc[val])[:, 1], y.iloc[val]
+    else:
+        raw_val, y_val = oof_scores(tier, X, y, fold_positions), y
+        pipeline = make_pipeline(tier).fit(X, y)
+    calibrator = fit_calibrator(args.calibration, raw_val, y_val)
+    cal_val = apply_calibrator(calibrator, raw_val)
+    threshold = pick_threshold(y_val, cal_val, args.precision_target)
     model = FraudModel(
         tier=tier,
-        pipeline=make_pipeline(tier).fit(X, y),
+        pipeline=pipeline,
         calibrator=calibrator,
         threshold=threshold,
         review_threshold=min(args.review_score, threshold),
@@ -58,7 +68,7 @@ def train_tier(tier, X, y, fold_positions, X_test, y_test, args):
     flagged = test_scores >= model.threshold
     row = {
         "tier": tier,
-        "oof_pr_auc": average_precision_score(y, raw_oof),
+        "val_pr_auc": average_precision_score(y_val, raw_val),
         "test_pr_auc": average_precision_score(y_test, test_scores),
         "test_roc_auc": roc_auc_score(y_test, test_scores),
         "test_brier": brier_score_loss(y_test, test_scores),
@@ -81,7 +91,7 @@ def main():
     p.add_argument("--raw", type=Path, default=RAW_CSV)
     p.add_argument("--splits", type=Path, default=SPLITS_JSON)
     p.add_argument("--dev-split", action="store_true", help="ignore splits.json; random non-grouped split (leaky)")
-    p.add_argument("--tiers", nargs="+", default=list(TIERS), choices=list(TIERS))
+    p.add_argument("--tiers", nargs="+", default=[t for t in TIERS if t not in OPTIONAL_TIERS], choices=list(TIERS))
     # Sigmoid (Platt) by default: same Brier score as isotonic here, without isotonic's tied step scores.
     p.add_argument("--calibration", choices=["isotonic", "sigmoid"], default="sigmoid")
     p.add_argument("--precision-target", type=float, default=0.90, help="precision required for the 'high' label")
@@ -123,7 +133,8 @@ def main():
     table = pd.DataFrame(rows)
     split_note = "**DEV SPLIT (not group-aware) — do not report.**" if args.dev_split else f"Splits: `{args.splits.name}`."
     note = (f"{split_note} Calibration: {args.calibration}. "
-            f"Threshold = lowest with out-of-fold precision >= {args.precision_target:.2f}.")
+            f"Threshold = lowest with validation precision >= {args.precision_target:.2f} "
+            f"(out-of-fold for A-C, last fold only for D).")
     (args.out / "ablation.md").write_text(to_markdown(table, note))
     print(table.to_string(index=False, float_format="%.3f"))
     if args.deploy_tier not in args.tiers:

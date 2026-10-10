@@ -15,7 +15,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-TEXT_FIELDS = ["title", "company_profile", "description", "requirements", "benefits"]
+# Profile last: tier D truncates long text, and pasted text arrives as `description`.
+TEXT_FIELDS = ["title", "description", "requirements", "benefits", "company_profile"]
 BINARY = ["telecommuting", "has_company_logo", "has_questions"]
 CATEGORICAL = ["employment_type", "required_experience", "required_education"]
 MISSING_FIELDS = [
@@ -36,7 +37,10 @@ TIERS = {
     "B": (False, True, False),
     "C": (True, True, False),
     "C-noshortcut": (True, True, True),
+    "D": (False, True, False),  # fine-tuned DistilBERT, see bert.py
 }
+# Not trained unless asked for: slow, and needs requirements-bert.txt.
+OPTIONAL_TIERS = ["D"]
 
 # EMSCAD masks contact details as #URL_<hash>#, #EMAIL_<hash>#, #PHONE_<hash>#.
 # Real pasted text is mapped to the same tokens so train and inference agree.
@@ -70,6 +74,9 @@ def build_frame(raw):
 
 
 def make_pipeline(tier):
+    if tier == "D":
+        from src.model.bert import BertClassifier
+        return BertClassifier()
     use_meta, use_text, drop_shortcuts = TIERS[tier]
     transformers = []
     if use_meta:
