@@ -24,7 +24,8 @@ def _device():
 class BertClassifier:
     """fit(frame, y) / predict_proba(frame) on the frame's `text` column."""
 
-    def __init__(self, model_name="distilbert-base-uncased", epochs=2, max_len=256, batch_size=32, lr=3e-5, seed=0):
+    # 3 epochs at 512 tokens beat 2 at 256 (most postings exceed 256 tokens); batch 16 fits a 16 GB laptop.
+    def __init__(self, model_name="distilbert-base-uncased", epochs=3, max_len=512, batch_size=16, lr=3e-5, seed=0):
         self.model_name = model_name
         self.epochs = epochs
         self.max_len = max_len

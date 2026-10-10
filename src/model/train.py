@@ -3,7 +3,7 @@
     python -m src.model.train                 # uses A's data/processed/splits.json
     python -m src.model.train --dev-split     # until splits.json exists; numbers not reportable
 
-    python -m src.model.train --tiers D       # DistilBERT; needs requirements-bert.txt, ~20 min on an M2
+    python -m src.model.train --tiers D       # DistilBERT; needs requirements-bert.txt, ~35 min on an M2
 
 Per tier: out-of-fold scores on the train/val folds drive calibration and
 threshold selection; the test ids are only ever scored once, at the end.
