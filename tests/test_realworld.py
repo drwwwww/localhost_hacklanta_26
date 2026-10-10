@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 
 from src.model.verdict import combined_risk
-from src.realworld import reddit
+from src.realworld import live, reddit
 from src.realworld.dataset import snippet
 
 
@@ -73,6 +73,24 @@ class VerdictAndSnippetTest(unittest.TestCase):
         text = " ".join(f"w{i}" for i in range(200))
         self.assertEqual(snippet(text), snippet(text))
         self.assertEqual(len(snippet(text).split()), 17)
+
+
+class LivePostingsTest(unittest.TestCase):
+    def test_html_becomes_plain_text_with_line_breaks(self):
+        markup = "&lt;p&gt;Pay: $20&amp;nbsp;an hour&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Close the register&lt;/li&gt;&lt;li&gt;Stock shelves&lt;/li&gt;&lt;/ul&gt;"
+        self.assertEqual(live.html_to_text(markup), "Pay: $20 an hour\nClose the register\nStock shelves")
+
+    def test_script_content_is_dropped(self):
+        self.assertEqual(live.html_to_text("<p>Apply today</p><script>track('x')</script>"), "Apply today")
+
+    def test_lever_rows_join_description_and_lists(self):
+        payload = {"fetched": "2026-10-10", "data": [{
+            "id": "abc", "text": "Barista", "hostedUrl": "https://jobs.lever.co/x/abc", "categories": {"location": "Atlanta"},
+            "descriptionPlain": "Make coffee.", "lists": [{"text": "Requirements", "content": "<li>Friendly</li>"}],
+            "additionalPlain": "Equal opportunity employer."}]}
+        row = next(live._rows("lever", "x", payload))
+        self.assertEqual(row["body"], "Make coffee.\nRequirements\nFriendly\nEqual opportunity employer.")
+        self.assertEqual((row["source_id"], row["title"], row["location"]), ("abc", "Barista", "Atlanta"))
 
 
 if __name__ == "__main__":

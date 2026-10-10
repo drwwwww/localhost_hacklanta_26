@@ -25,6 +25,7 @@ reshipping) are barely present in 2012-2014 data. That part needs modern data.
 |---|---|---|---|
 | r/Scams via [Arctic Shift](https://arctic-shift.photon-reddit.com) (2024-01 onward) | Real job-scam messages people received, quoted in their posts, plus whole posts | Reddit user content; used for non-commercial research | IDs and labels only. Text cached in `data/external/reddit/` |
 | [LinkedIn job postings, mid-2023](https://huggingface.co/datasets/xanderios/linkedin-job-postings) | 7,500 real modern legitimate postings (6,000 train, 1,500 eval, disjoint companies) | Uploader says MIT, but it is scraped LinkedIn content | Job IDs only (`data/realworld/linkedin_ids.csv`) |
+| Employer career boards on Greenhouse and Lever (snapshot of 2026-10-10) | 413 postings open right now at 61 employers, for false alarms on current text. Evaluation only, never training | Public JSON feeds the boards publish for outside use; the text belongs to the employers | Posting IDs only (`data/realworld/live_ids.csv`). Text cached in `data/external/live/` |
 
 Labels for Reddit come from Reddit, not from the rule author: "Scam report" / "Victim of
 a scam" flairs are scams; "Is this a scam?" posts take the community verdict from the
@@ -59,4 +60,6 @@ python -m src.realworld.reddit          # slow: the archive is rate-limited and 
 python -m src.realworld.dataset         # LinkedIn sample + committed index, prints counts
 python -m src.model.train --tiers F FE  # augmented tiers (short windows + real modern data)
 python -m src.model.realworld_eval      # model vs rules vs combined, per kind of text
+python -m src.realworld.live            # live postings from employer boards (cached; --refresh for a new snapshot)
+python -m src.model.live_eval           # false alarms on those, full postings and 17-word cuts
 ```
