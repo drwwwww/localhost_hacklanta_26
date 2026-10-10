@@ -85,5 +85,6 @@ def make_pipeline(tier):
         transformers.append(("tfidf", tfidf, "text"))
     return Pipeline([
         ("features", ColumnTransformer(transformers)),
-        ("clf", LogisticRegression(class_weight="balanced", solver="liblinear", max_iter=2000)),
+        # C=10: PR-AUC plateaus there under duplicate-aware CV; C=1 underfits the text tiers.
+        ("clf", LogisticRegression(class_weight="balanced", solver="liblinear", C=10, max_iter=2000)),
     ])

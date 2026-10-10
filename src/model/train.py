@@ -46,12 +46,13 @@ def train_tier(tier, X, y, fold_positions, X_test, y_test, args):
     raw_oof = oof_scores(tier, X, y, fold_positions)
     calibrator = fit_calibrator(args.calibration, raw_oof, y)
     cal_oof = apply_calibrator(calibrator, raw_oof)
+    threshold = pick_threshold(y, cal_oof, args.precision_target)
     model = FraudModel(
         tier=tier,
         pipeline=make_pipeline(tier).fit(X, y),
         calibrator=calibrator,
-        threshold=pick_threshold(y, cal_oof, args.precision_target),
-        review_threshold=pick_threshold(y, cal_oof, args.review_precision),
+        threshold=threshold,
+        review_threshold=min(args.review_score, threshold),
     )
     test_scores = model.score(X_test)
     flagged = test_scores >= model.threshold
@@ -81,9 +82,12 @@ def main():
     p.add_argument("--splits", type=Path, default=SPLITS_JSON)
     p.add_argument("--dev-split", action="store_true", help="ignore splits.json; random non-grouped split (leaky)")
     p.add_argument("--tiers", nargs="+", default=list(TIERS), choices=list(TIERS))
-    p.add_argument("--calibration", choices=["isotonic", "sigmoid"], default="isotonic")
+    # Sigmoid (Platt) by default: same Brier score as isotonic here, without isotonic's tied step scores.
+    p.add_argument("--calibration", choices=["isotonic", "sigmoid"], default="sigmoid")
     p.add_argument("--precision-target", type=float, default=0.90, help="precision required for the 'high' label")
-    p.add_argument("--review-precision", type=float, default=0.50, help="precision required for the 'medium' label")
+    # A fixed probability, not a precision target: cumulative precision of 50% is already met at a
+    # ~3% score, which would label uninformative text (scores near the base rate) as medium.
+    p.add_argument("--review-score", type=float, default=0.10, help="calibrated score at which 'medium' starts")
     # Text-only by default: pasted postings/DMs in the demo carry no EMSCAD metadata.
     p.add_argument("--deploy-tier", default="B", choices=list(TIERS), help="tier saved as models/model.joblib")
     p.add_argument("--out", type=Path, default=ROOT / "models")
