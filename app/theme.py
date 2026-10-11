@@ -126,7 +126,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0.45rem 0.45rem 0.45rem 1.1rem;
+    padding: 0.6rem 0.6rem 0.6rem 1.3rem;
     border-radius: 999px;
     background: rgba(15,19,32,0.55);
     backdrop-filter: blur(18px) saturate(160%);
@@ -141,15 +141,16 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 .st-key-page [data-testid="stExpander"] details { border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--panel); }
 .brand-logo { height: 1.45rem; width: auto; display: block; }
 .nav .brand-logo { height: 2.15rem; }
-.nav-links { display: flex; gap: 1.8rem; }
+.nav-links { display: flex; gap: 2rem; }
 .nav-links a, .nav-actions .ghost {
     color: var(--muted) !important;
     text-decoration: none !important;
-    font-size: 0.86rem;
+    font-size: 0.94rem;
     transition: color 0.15s ease;
 }
 .nav-links a:hover { color: var(--paper) !important; }
 .nav-actions { display: flex; justify-content: flex-end; }
+.nav .btn-sm { min-height: 2.45rem; padding: 0 1.15rem; font-size: 0.9rem; }
 
 .btn {
     display: inline-flex;
