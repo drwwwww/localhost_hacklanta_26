@@ -126,7 +126,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0.6rem 0.6rem 0.6rem 1.3rem;
+    padding: 0.6rem 0.6rem 0.6rem 1.8rem;
     border-radius: 999px;
     background: rgba(15,19,32,0.55);
     backdrop-filter: blur(18px) saturate(160%);
@@ -140,7 +140,8 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 .st-key-page [data-testid="stMarkdownContainer"] p { color: #c4c9d4; line-height: 1.6; }
 .st-key-page [data-testid="stExpander"] details { border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--panel); }
 .brand-logo { height: 1.45rem; width: auto; display: block; }
-.nav .brand-logo { height: 2.15rem; }
+/* The file's box includes room for the g's tail, so the capitals sit high; nudge them onto the bar's centre line. */
+.nav .brand-logo { height: 2.15rem; transform: translateY(0.2rem); }
 .nav-links { display: flex; gap: 2rem; }
 .nav-links a, .nav-actions .ghost {
     color: var(--muted) !important;
