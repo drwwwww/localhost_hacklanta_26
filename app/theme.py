@@ -8,7 +8,7 @@ from pathlib import Path
 import streamlit as st
 
 BRAND = "BogusAI"
-LOGO = Path(__file__).parent / "assets" / "BogusAI-1.svg"
+LOGO = Path(__file__).parent / "assets" / "BogusAI-2.svg"
 
 BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');
