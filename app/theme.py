@@ -140,7 +140,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 .st-key-page [data-testid="stMarkdownContainer"] p { color: #c4c9d4; line-height: 1.6; }
 .st-key-page [data-testid="stExpander"] details { border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--panel); }
 .brand-logo { height: 1.45rem; width: auto; display: block; }
-.nav .brand-logo { height: 1.9rem; }
+.nav .brand-logo { height: 2.15rem; }
 .nav-links { display: flex; gap: 1.8rem; }
 .nav-links a, .nav-actions .ghost {
     color: var(--muted) !important;
