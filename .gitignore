@@ -21,6 +21,7 @@ models/*
 !models/model_B.joblib
 !models/model_F.joblib
 !models/SHA256SUMS
+!models/gap_deployed.json
 
 # notebooks checkpoints
 .ipynb_checkpoints/

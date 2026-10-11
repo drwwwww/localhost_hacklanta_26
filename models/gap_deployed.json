@@ -1,0 +1,30 @@
+{
+ "model_sha256": "0fd26cbe42d9bf7787e972841123e79c12b7427152896ee22894282f52842ec1",
+ "challenge_sha256": "e0540df7604b0c20d966cf418537c5c973cf7d1a8c79922ffcf549adacc17261",
+ "rows": [
+  {
+   "tier": "F",
+   "dataset": "EMSCAD test",
+   "n": 3429,
+   "n_fraud": 150,
+   "pr_auc": 0.8833969533436448,
+   "roc_auc": 0.9893422791501475,
+   "precision_high": 0.896551724137931,
+   "recall_high": 0.6933333333333334,
+   "legit_flagged_high": 0.0036596523330283625,
+   "fraud_rated_low": 0.08
+  },
+  {
+   "tier": "F",
+   "dataset": "Challenge set",
+   "n": 208,
+   "n_fraud": 80,
+   "pr_auc": 0.7031647158783836,
+   "roc_auc": 0.8170898437499999,
+   "precision_high": 0.7857142857142857,
+   "recall_high": 0.4125,
+   "legit_flagged_high": 0.0703125,
+   "fraud_rated_low": 0.15
+  }
+ ]
+}

@@ -25,3 +25,15 @@ class VerifyModelsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DeployedGapTests(unittest.TestCase):
+    def test_saved_gap_table_matches_the_committed_model_and_challenge_set(self):
+        """If this fails, run `python -m src.model.gap --save-deployed` and commit the result."""
+        import json
+
+        from src.model.gap import DEPLOYED_GAP, _inputs
+
+        saved = json.loads(DEPLOYED_GAP.read_text(encoding="utf-8"))
+        self.assertEqual({k: saved[k] for k in _inputs()}, _inputs())
+        self.assertEqual([r["dataset"] for r in saved["rows"]], ["EMSCAD test", "Challenge set"])

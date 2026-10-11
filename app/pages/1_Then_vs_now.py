@@ -9,7 +9,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.model.gap import CHALLENGE_CSV, gap_table  # noqa: E402
+from src.model.gap import CHALLENGE_CSV, deployed_gap_table  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model  # noqa: E402
 from background import render_background  # noqa: E402
 from theme import apply_theme, render_nav  # noqa: E402
@@ -26,8 +26,8 @@ INK = {"light": "#0b0b0b", "dark": "#ece8df"}
 
 
 @st.cache_data(show_spinner="Scoring both datasets...")
-def load_gap(tier, model_mtime):  # mtime: rescore after a retrain
-    return gap_table([tier])
+def load_gap(model_mtime):  # mtime: reload after a retrain
+    return deployed_gap_table()
 
 
 st.set_page_config(page_title="Then vs now", page_icon="🔎", layout="wide")
@@ -46,7 +46,7 @@ with page:
 
     model = load_model()
     try:
-        table = load_gap(model.tier, MODEL_PATH.stat().st_mtime).set_index("dataset")
+        table = load_gap(MODEL_PATH.stat().st_mtime).set_index("dataset")
     except FileNotFoundError as e:
         st.error(f"Missing data file: `{e.filename}`. This page needs the raw EMSCAD csv, splits.json and the challenge set.")
         st.stop()
