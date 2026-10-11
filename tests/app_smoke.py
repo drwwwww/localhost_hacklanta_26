@@ -53,7 +53,7 @@ check("red-flag rules still raise the quiet scam to a high-risk verdict",
 
 _, hostile_md, _ = run(HOSTILE)
 check("script tag is escaped, not rendered", "<script" not in hostile_md and "&lt;script&gt;" in hostile_md)
-check("img tag is escaped, not rendered", "<img" not in hostile_md)
+check("img tag is escaped, not rendered", "<img src=x" not in hostile_md and "&lt;img src=x" in hostile_md)
 check("text box has a length cap", at.text_area[0].max_chars == 20000)
 check("privacy notice is shown", any("Nothing you paste is saved" in c.value for c in at.caption))
 cfg = (ROOT / ".streamlit" / "config.toml").read_text()

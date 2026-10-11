@@ -8,7 +8,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from background import render_background  # noqa: E402
-from theme import apply_theme, page_html, render_nav  # noqa: E402
+from theme import BRAND, apply_theme, brand_html, page_html, render_nav  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
 from src.model.verdict import combined_risk  # noqa: E402
 from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
@@ -75,7 +75,7 @@ def render_verdict(risk):
 # centered section heads over card grids, one inverted band with alternating feature
 # rows, an FAQ accordion, and a closing CTA band. Colors stay dark. GhostFibers fills
 # the page behind the hero and the closing band; every section between them is solid.
-st.set_page_config(page_title="Fake Job Detector", page_icon="🔎", layout="wide")
+st.set_page_config(page_title=BRAND, page_icon="🔎", layout="wide")
 render_background()
 apply_theme()
 render_nav()
@@ -684,7 +684,7 @@ page_html("""
         <div class="about-visual" data-reveal aria-hidden="true"><span class="pile p1">Flagged</span><span class="pile p2">Verify further</span><span class="pile p3">Looks clear</span></div>
         <div class="about-copy">
             <h2 class="serif-lg">A second opinion, not a verdict.</h2>
-            <p>Fake Job Detector is a student project from HackLanta 2026. It points out what looks wrong so you
+            <p>BogusAI is a student project from HackLanta 2026. It points out what looks wrong so you
             know what to check. It never decides for you whether an employer is real.</p>
             <p>The model learned from job postings collected between 2012 and 2014. Scams have changed since then,
             so we also test it against recent scam patterns written from public warnings. That's why every result
@@ -739,7 +739,7 @@ page_html("""
     <div class="wrap">
         <div class="footer-grid">
             <div>
-                <div class="brand" translate="no"><span class="brand-mark" aria-hidden="true"></span>Fake Job Detector</div>
+                <div class="brand" translate="no">""" + brand_html() + """</div>
                 <p class="footer-note">A warning to verify, never an accusation. Results are based on patterns,
                 not on any knowledge of a specific employer.</p>
             </div>

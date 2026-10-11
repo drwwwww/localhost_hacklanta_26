@@ -1,9 +1,14 @@
 """Shared look for every page: tokens, fonts, background pinning, nav, buttons and
 Streamlit widget styling. Page-specific sections and motion stay in each page."""
 
+import base64
 import re
+from pathlib import Path
 
 import streamlit as st
+
+BRAND = "BogusAI"
+LOGO = Path(__file__).parent / "assets" / "BogusAI-1.svg"
 
 BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');
@@ -134,10 +139,8 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 .st-key-page h1 { font-family: var(--serif) !important; font-weight: 400 !important; letter-spacing: -0.015em; color: var(--paper) !important; font-size: clamp(2.2rem, 4.4vw, 3.4rem) !important; line-height: 1.08 !important; }
 .st-key-page [data-testid="stMarkdownContainer"] p { color: #c4c9d4; line-height: 1.6; }
 .st-key-page [data-testid="stExpander"] details { border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--panel); }
-.brand-mark {
-    width: 1.05rem; height: 1.05rem; border-radius: 3px;
-    border: 1.5px double var(--red); transform: rotate(-8deg);
-}
+.brand-logo { height: 1.45rem; width: auto; display: block; }
+.nav .brand-logo { height: 1.9rem; }
 .nav-links { display: flex; gap: 1.8rem; }
 .nav-links a, .nav-actions .ghost {
     color: var(--muted) !important;
@@ -236,12 +239,18 @@ def apply_theme():
     st.markdown(f"<style>{BASE_CSS}</style>", unsafe_allow_html=True)
 
 
+def brand_html():
+    """The wordmark as an inline image, so it needs no static file serving."""
+    data = base64.b64encode(LOGO.read_bytes()).decode()
+    return f'<img class="brand-logo" src="data:image/svg+xml;base64,{data}" alt="{BRAND}">'
+
+
 def render_nav(skip_target="#check"):
     links = "".join(f'<a href="{href}" target="_self">{label}</a>' for label, href in NAV_LINKS)
     page_html(f"""
     <a class="skip" href="{skip_target}">Skip to main content</a>
     <nav class="nav" aria-label="Main">
-        <a class="brand" href="./" target="_self" translate="no"><span class="brand-mark" aria-hidden="true"></span>Fake Job Detector</a>
+        <a class="brand" href="./" target="_self" translate="no">{brand_html()}</a>
         <div class="nav-links">{links}</div>
         <div class="nav-actions"><a class="btn btn-solid btn-sm" href="./#check" target="_self">Check a posting</a></div>
     </nav>

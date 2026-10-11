@@ -1,4 +1,4 @@
-# Fake Job Detector
+# BogusAI
 
 A hackathon project (HackLanta 2026) that flags fraudulent job postings and recruiter messages, aimed at students. Trains on EMSCAD (2012-2014 real job-posting data) and evaluates against a hand-built "modern challenge set" of current scam patterns.
 
